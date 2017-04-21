@@ -1,0 +1,9 @@
+#board {
+    white-space: normal !important;
+    overflow: auto !important;
+}
+
+.list-wrapper {
+    height: auto !important;
+    margin: 10px !important;
+}

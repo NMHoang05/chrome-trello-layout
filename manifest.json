@@ -1,0 +1,20 @@
+{
+  "name": "Trello Layout",
+  "manifest_version": 2,
+  "version": "1.0",
+  "description": "Gets information from Google.",
+  "icons": { "128": "icon_19.png" },
+  "permissions": ["http://trello.com/", "https://trello.com/"],
+  "browser_action": {
+    "default_title": "Layout",
+    "default_icon": "icon_19.png",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://trello.com/*", "https://trello.com/*"],
+      "css": ["layout.css"],
+      "js": ["jquery-3.1.0.min.js", "layout.js"]
+    }
+  ]
+}
