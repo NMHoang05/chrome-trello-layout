@@ -1,19 +1,31 @@
 window.onload = function() {
     var theBoard = $("#board");
     chrome.runtime.onMessage.addListener(function(msg, _, sendResponse) {
-        if (!(msg && msg.source === 'chrome-trello-layout')) return;
-        switch(msg.choice) {
-            case '0':
-                defaultLayout();
+        if (!msg || !msg.source) return;
+        
+        switch (msg.source) {
+            case "chrome-trello-layout-init":
+                chrome.extension.sendRequest({
+                    source: 'chrome-trello-layout-init',
+                    url: location.href
+                });
                 break;
-            case '1':
-                gridLayout();
-                break;
-            case '2':
-                columnLayout(msg.data);
-                break;
-            case '3':
-                rowLayout(msg.data);
+            case "chrome-trello-layout-choice":
+                localStorage.setItem('chrome-trello-layout.choice', msg.choice);
+                switch(msg.choice) {
+                    case '0':
+                        defaultLayout();
+                        break;
+                    case '1':
+                        gridLayout();
+                        break;
+                    case '2':
+                        columnLayout(msg.data);
+                        break;
+                    case '3':
+                        rowLayout(msg.data);
+                        break;
+                }
                 break;
         }
     });
@@ -41,11 +53,23 @@ window.onload = function() {
         theBoard.removeClass('chrome-trello-layout-column');
         theBoard.addClass('chrome-trello-layout-row');
     }
-
-    $('#board').click(function() {
-        console.log('clicked');
-        chrome.extension.sendRequest('clicked');
-    });
     
+    var choice = localStorage.getItem('chrome-trello-layout.choice') || 0;
+    switch(choice) {
+        case '1':
+            gridLayout();
+            break;
+        case '2':
+            columnLayout(msg.data);
+            break;
+        case '3':
+            rowLayout(msg.data);
+            break;
+    }
+    
+    chrome.extension.sendRequest({
+        source: 'chrome-trello-layout-init',
+        url: location.href
+    });
 };
 
