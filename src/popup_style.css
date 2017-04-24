@@ -1,0 +1,47 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background-color: transparent;
+    width: 300px;
+    font-size: 25px;
+}
+
+hr {
+    margin: 10px 0;
+}
+
+.alg-center {
+    text-align: center;
+}
+
+.dialog-header {
+    text-align: center;
+}
+
+.dialog-footer {
+    text-align: center;
+    font-size: 0.8em;
+    padding-bottom: 10px;
+}
+
+.choice-wrapper {
+    padding-left: 10px;
+    margin-bottom: 10px;
+}
+    .choice-wrapper .legend {
+        font-size: 0.8em;
+    }
+    
+        .choice-wrapper .legend[data-state=active] {
+            color: blue;
+        }
+
+    .choice-wrapper .content {
+        overflow: hidden;
+        max-height: 0;
+    }
+    
+    .choice-wrapper .legend[data-state=active] ~ .content {
+        max-height: none;
+    }
+    

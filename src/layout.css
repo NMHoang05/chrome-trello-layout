@@ -1,9 +1,10 @@
-#board {
+
+#board.chrome-trello-layout-grid {
     white-space: normal !important;
     overflow: auto !important;
 }
 
-.list-wrapper {
+#board.chrome-trello-layout-grid .list-wrapper {
     height: auto !important;
     margin: 10px !important;
 }

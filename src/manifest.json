@@ -3,11 +3,11 @@
   "manifest_version": 2,
   "version": "1.0",
   "description": "Gets information from Google.",
-  "icons": { "128": "icon_19.png" },
+  "icons": { "128": "assets/app_icon.png" },
   "permissions": ["http://trello.com/", "https://trello.com/"],
   "browser_action": {
     "default_title": "Layout",
-    "default_icon": "icon_19.png",
+    "default_icon": "assets/app_icon.png",
     "default_popup": "popup.html"
   },
   "content_scripts": [
