@@ -21,6 +21,16 @@ body {
     animation: spin 2s linear infinite;
 }
 
+.loader-mini {
+    display: inline-block;
+    border: 3px solid #BAC9D3; /* Light grey */
+    border-top: 3px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 2s linear infinite;
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -50,7 +60,7 @@ hr {
 }
 
 .choice-wrapper {
-    padding-left: 10px;
+    padding: 0 10px;
     margin-bottom: 10px;
 }
     .choice-wrapper .legend {
@@ -60,13 +70,86 @@ hr {
         .choice-wrapper .legend[data-state=active] {
             color: blue;
         }
+    
+        .choice-wrapper .legend[data-state=active] ~ .content {
+            max-height: none;
+            overflow: visible;
+        }
 
     .choice-wrapper .content {
         overflow: hidden;
         max-height: 0;
+        font-size: 0.7em;
     }
     
-    .choice-wrapper .legend[data-state=active] ~ .content {
-        max-height: none;
-    }
-    
+        .choice-wrapper .content .option {
+            font-size: 0.8em;
+        }
+        
+        .choice-wrapper .content .item-list-wrapper {
+            position: relative;
+            margin-bottom: 3px;
+        }
+            .choice-wrapper .content .item-list-wrapper .item-auto-list {
+                position: absolute;
+                left: 0;
+                z-index: 5;
+                
+                width: 100%;
+                max-height: 300px;
+                overflow: auto;
+                border: 1px solid gray;
+                background-color: white;
+                display: none;
+            }
+        
+        .choice-wrapper .content .item-list {
+            min-height: 30px;
+            font-size: 0.7em;
+            border: 1px solid gray;
+            background-color: white;
+            padding: 4px;
+        }
+            .choice-wrapper .content .item-list .item {
+                display: inline-block;
+                padding: 2px;
+                background-color: #BAC9D3;
+                border-radius: 2px;
+                margin-right: 3px;
+                margin-bottom: 3px;
+            }
+            
+             .choice-wrapper .content .item-list:focus {
+                border-color: #3498db;
+             }
+                .choice-wrapper .content .item-list:focus ~ .item-auto-list {
+                    z-index: 10;
+                }
+
+            .choice-wrapper .content .item-list-wrapper .item-auto-list .item {
+                display: block;
+                padding: 3px;
+                color: black;
+                background-color: white;
+                cursor: pointer;
+            }
+
+                .choice-wrapper .content .item-list-wrapper .item-auto-list .item b {
+                    color: darkgreen;
+                    text-align: right;
+                }
+                .choice-wrapper .content .item-list-wrapper .item-auto-list .item.not-match {
+                    display: none;
+                }
+
+                    .choice-wrapper .content .item-list-wrapper .item-auto-list .item.no-item {
+                        display: none;
+                        text-align: center;
+                    }
+                    .choice-wrapper .content .item-list-wrapper .item-auto-list[data-empty] .item.no-item {
+                        display: block;
+                    }
+
+                .choice-wrapper .content .item-list-wrapper .item-auto-list .item:hover {
+                    color: blue;
+                }

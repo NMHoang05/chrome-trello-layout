@@ -8,3 +8,65 @@
     height: auto !important;
     margin: 10px !important;
 }
+
+.chrome-trello-group::-webkit-scrollbar-track-piece {
+    background: rgba(0,0,0,0.15);
+}
+
+#board.chrome-trello-layout-column {
+
+}
+
+#board.chrome-trello-layout-column.shared-scroll {
+    white-space: normal !important;
+    overflow: auto !important;
+}
+
+    #board.chrome-trello-layout-column .list-wrapper {
+        height: auto !important;
+        margin: 10px !important;
+    }
+
+    #board.chrome-trello-layout-column .chrome-trello-group {
+        white-space: normal !important;
+        overflow: auto !important;
+        display: inline-block;
+        vertical-align: top;
+        margin-top: 5px;
+    }
+
+    #board.chrome-trello-layout-column:not(.shared-scroll) .chrome-trello-group {
+        height: 100%;
+    }
+
+    #board.chrome-trello-layout-column.shared-scroll .chrome-trello-group {
+        overflow:visible;
+        height:auto;
+        min-height:100%;
+    }
+
+#board.chrome-trello-layout-row {
+    overflow: auto !important;
+}
+
+#board.chrome-trello-layout-row.shared-scroll {
+    white-space: normal !important;
+}
+
+#board.chrome-trello-layout-row .chrome-trello-group {
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    white-space: nowrap;
+}
+
+    #board.chrome-trello-layout-row.shared-scroll .chrome-trello-group {
+        overflow: visible;
+        width: auto;
+    }
+
+    #board.chrome-trello-layout-row:not(.shared-scroll) .chrome-trello-group {
+        overflow: auto;
+        width: 100%;
+    }
+
