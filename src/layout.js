@@ -1,5 +1,10 @@
 window.onload = function() {
     var theBoard = $("#board");
+    var board_url = location.href;
+    var storage_key_choice = "chrome-trello-layout.choice|" + board_url;
+    var storage_key_count = "chrome-trello-layout.count|" + board_url;
+    var storage_key_extra = "chrome-trello-layout.extra|" + board_url;
+    var storage_key_format = "chrome-trello-layout.format|" + board_url;
 
     var helpers = {
         find_list_node_with_name: function(name) {
@@ -13,19 +18,44 @@ window.onload = function() {
         }
     };
 
-    chrome.runtime.onMessage.addListener(function(msg, _, sendResponse) {
-        if (!msg || !msg.source) return;
+    var choice = localStorage.getItem(storage_key_choice) || 0;
+    function get_init_object() {
+        var init_obj = {
+            source: 'chrome-trello-layout-init',
+            url: location.href,
+            choice: choice
+        };
+        var data;
+        switch (choice) {
+            case '2':
+            case '3':
+                init_obj.list = getHeadersList();
+                init_obj.count = localStorage.getItem(storage_key_count);
+                init_obj.extra = localStorage.getItem(storage_key_extra);
+                init_obj.format = null;
+                data = localStorage.getItem(storage_key_format);
+                if (data != null) {
+                    try {
+                        data = JSON.parse(data);
+
+                        init_obj.format = data;
+                    } catch (e) {
+                    }
+                }
+                break;
+        }
+        return init_obj;
+    }
+
+    chrome.runtime.onMessage.addListener(function(data, _, sendResponse) {
+        if (!data || !data.source) return;
         
-        switch (msg.source) {
+        switch (data.source) {
             case "chrome-trello-layout-init":
-                chrome.extension.sendRequest({
-                    source: 'chrome-trello-layout-init',
-                    url: location.href,
-                    choice: choice
-                });
+                chrome.extension.sendRequest(get_init_object());
                 break;
             case "chrome-trello-layout-choice":
-                switch(msg.choice) {
+                switch(data.choice) {
                     case '0':
                         defaultLayout();
                         break;
@@ -39,8 +69,8 @@ window.onload = function() {
                 }
                 break;
             case "chrome-trello-layout-apply":
-                localStorage.setItem('chrome-trello-layout.choice', msg.choice);
-                switch(msg.choice) {
+                localStorage.setItem(storage_key_choice, data.choice);
+                switch(data.choice) {
                     case '2':
                         theBoard.removeClass('chrome-trello-layout-grid');
                         theBoard.addClass('chrome-trello-layout-column');
@@ -52,10 +82,11 @@ window.onload = function() {
                         theBoard.addClass('chrome-trello-layout-row');
                         break;
                 }
-                choice = msg.choice;
-                localStorage.setItem('chrome-trello-layout.count', msg.count);
-                localStorage.setItem('chrome-trello-layout.format', JSON.stringify(msg.list));
-                layoutApply(msg);
+                choice = data.choice;
+                localStorage.setItem(storage_key_count, data.count);
+                localStorage.setItem(storage_key_extra, data.extra);
+                localStorage.setItem(storage_key_format, JSON.stringify(data.format));
+                layoutApply(data);
                 break;
         }
     });
@@ -78,7 +109,7 @@ window.onload = function() {
             }
             theBoard.find('> .chrome-trello-group').remove();
         }
-        localStorage.setItem('chrome-trello-layout.choice', 0);
+        localStorage.setItem(storage_key_choice, 0);
         choice = 0;
         theBoard.removeClass('chrome-trello-layout-grid');
         theBoard.removeClass('chrome-trello-layout-column');
@@ -94,7 +125,7 @@ window.onload = function() {
             }
             theBoard.find('> .chrome-trello-group').remove();
         }
-        localStorage.setItem('chrome-trello-layout.choice', 1);
+        localStorage.setItem(storage_key_choice, 1);
         choice = 1;
         theBoard.addClass('chrome-trello-layout-grid');
         theBoard.removeClass('chrome-trello-layout-column');
@@ -105,7 +136,7 @@ window.onload = function() {
         chrome.extension.sendRequest({
             source: 'chrome-trello-layout-fetch',
             choice: choice,
-            count: localStorage.getItem('chrome-trello-layout.count') || 1,
+            count: localStorage.getItem(storage_key_count) || 1,
             list: getHeadersList()
         });
     }
@@ -137,12 +168,12 @@ window.onload = function() {
         }
 
         var add_list = $('.js-add-list');
-        for(i = 0; i < data.list.length; i++) {
-            for(var j = 0; j < data.list[i].length; j++) {
-                if (data.list[i][j] == '<b>[New List]</b>') {
+        for(i = 0; i < data.format.length; i++) {
+            for(var j = 0; j < data.format[i].length; j++) {
+                if (data.format[i][j] == '<b>[New List]</b>') {
                     grps[i].append(add_list[0]);
                 } else {
-                    var nd = helpers.find_list_node_with_name(data.list[i][j]);
+                    var nd = helpers.find_list_node_with_name(data.format[i][j]);
                     if (nd != null) {
                         grps[i].append(nd);
                     }
@@ -156,24 +187,28 @@ window.onload = function() {
         }
     }
 
-    var choice = localStorage.getItem('chrome-trello-layout.choice') || 0;
-    var init_obj = {
-        source: 'chrome-trello-layout-init',
-        url: location.href,
-        choice: choice
-    };
-    switch(choice) {
+    var init_load = get_init_object();
+    switch (init_load.choice) {
         case '1':
             gridLayout();
             break;
         case '2':
-            init_obj.list = getHeadersList();
+            theBoard.removeClass('chrome-trello-layout-grid');
+            theBoard.addClass('chrome-trello-layout-column');
+            theBoard.removeClass('chrome-trello-layout-row');
+            if (init_load.format != null) {
+                layoutApply(init_load);
+            }
             break;
         case '3':
-            init_obj.list = getHeadersList();
+            theBoard.removeClass('chrome-trello-layout-grid');
+            theBoard.removeClass('chrome-trello-layout-column');
+            theBoard.addClass('chrome-trello-layout-row');
+            if (init_load.format != null) {
+                layoutApply(init_load);
+            }
             break;
     }
-    
-    chrome.extension.sendRequest(init_obj);
+    chrome.extension.sendRequest(init_load);
 };
 

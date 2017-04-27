@@ -54,6 +54,10 @@ window.onload = function() {
             selection.removeAllRanges();
             selection.addRange(range);
         },
+        remove_from_array: function(array, element) {
+            var i = array.indexOf(element);
+            if (i > -1) array.splice(i, 1);
+        },
         intersection: function(){
             return Array.from(arguments).reduce(function(previous, current){
                 return previous.filter(function(element){
@@ -94,7 +98,7 @@ window.onload = function() {
                     rdo.prop('checked', true);
                     
                     layout_choice_box = prev_option.siblings('.content');
-                    
+
                     switch (choice) {
                         case '2':
                         case '3':
@@ -158,6 +162,7 @@ window.onload = function() {
 
         var header = $((choice == 2 ? markup_header : markup_header_r).join(''));
         header.appendTo(layout_choice_box);
+        header.find('input[name=individual-column-scroll]').prop('checked', data.extra == 1);
         var count_input = header.find('#count-input');
         count_input.val(layout_count);
         count_input.on('input', function() {
@@ -170,7 +175,7 @@ window.onload = function() {
         for (var i = 0; i < layout_count; i++) {
             ls = $(markup_list.join(''));
             ls.appendTo(layout_choice_box);
-            handle_autolist(ls);
+            handle_autolist(ls, data.format != null ? data.format[i] : null );
             lists.push(ls);
         }
         var footer = $(markup_footer);
@@ -191,7 +196,7 @@ window.onload = function() {
             for (var i = 0; i < layout_count; i++) {
                 ls = $(markup_list.join(''));
                 ls.appendTo(layout_choice_box);
-                handle_autolist(ls);
+                handle_autolist(ls, null);
                 lists.push(ls);
             }
 
@@ -199,11 +204,19 @@ window.onload = function() {
         }
     }
 
-    function handle_autolist(inst) {
+    function handle_autolist(inst, loaded_items) {
         var auto_list = inst.find('.item-auto-list');
         var input = inst.find('.item-list');
         var input_nd = input[0];
         var timer_blur = null;
+
+        if (loaded_items != null) {
+            for(var i = 0; i < loaded_items.length; i++) {
+                $('<span class="item" contenteditable="false">' + loaded_items[i] + '</span>').prependTo(input);
+                helpers.remove_from_array(item_list, loaded_items[i]);
+            }
+            if (!helpers.is_last_node_br(input_nd)) $('<br>').appendTo(input);
+        }
 
         function get_current_list() {
             var result = [];
@@ -311,24 +324,24 @@ window.onload = function() {
     }
 
     function apply_layout() {
-        var lists = [];
-        var lst;
+        var format = [];
+        var list;
         var inp_lst = layout_choice_box.find('.item-list');
         var items;
         for (var i = 0; i < inp_lst.length; i++) {
-            lst = [];
+            list = [];
             items = $(inp_lst[i]).find('.item');
             for(var j = 0; j < items.length; j++) {
-                lst.push(items[j].innerHTML);
+                list.push(items[j].innerHTML);
             }
-            lists.push(lst);
+            format.push(list);
         }
         sendMessage({
             source: 'chrome-trello-layout-apply',
             choice: choice,
             count: layout_count,
             extra: $('input[name=individual-column-scroll]').is(':checked') ? 1 : 0,
-            list: lists
+            format: format
         });
     }
     
